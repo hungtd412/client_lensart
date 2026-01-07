@@ -1,0 +1,45 @@
+import api from "../utils/api";
+
+export const createOrder = async (orderData) => {
+  try {
+    const response = await api.post('/orders/create', orderData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const createPayOSCheckout = async (orderId, shipping_fee) => {
+  try {
+    // Get base URL from environment variable
+    const baseUrl = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
+    
+    const response = await api.post(`/transactions/orders/${orderId}/create`, {
+      returnUrl: `${baseUrl}/order-success`,
+      cancelUrl: `${baseUrl}/gio-hang`,
+      shipping_fee: shipping_fee
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getPaymentInfo = async (transactionId) => {
+  try {
+    const response = await api.get(`/${transactionId}/info`);
+    return response.data.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+}
+
+export const updatePaymentStatus = async (orderId) => {
+  try {
+    console.log(orderId)
+    const response = await api.post(`transactions/update/order/${orderId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+}

@@ -11,9 +11,15 @@ export const createOrder = async (orderData) => {
 
 export const createPayOSCheckout = async (orderId, shipping_fee) => {
   try {
+    // Get base URL from environment variable
+    // For development: use localhost:3000 (matching vite.config.js)
+    // For production/Azure: use VITE_APP_URL from environment
+    const baseUrl = import.meta.env.VITE_APP_URL || 
+                    (import.meta.env.DEV ? 'http://localhost:3000' : window.location.origin);
+    
     const response = await api.post(`/transactions/orders/${orderId}/create`, {
-      returnUrl: "http://localhost:5173/order-success",
-      cancelUrl: "http://localhost:5173/gio-hang",
+      returnUrl: `${baseUrl}/order-success`,
+      cancelUrl: `${baseUrl}/gio-hang`,
       shipping_fee: shipping_fee
     });
     return response.data;

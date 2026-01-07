@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../utils/api';
 import Table from '../../../components/Admin/Manage_Products/Product-Reviews/Table';
 import Pagination from "../../../components/Admin/Manage_Products/Product-Reviews/Pagination";
 
@@ -33,7 +33,7 @@ const Product_ReviewsPage = () => {
   const refreshReviews = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/reviews');
+      const response = await api.get('/reviews');
       if (response.data) {
         const reviewsData = response.data.data || [];
         // Ensure all required fields are present
@@ -41,7 +41,7 @@ const Product_ReviewsPage = () => {
           id: review.id,
           product_name: review.product_name || 'Unknown Product',
           user_name: review.user_name || 'Unknown User',
-          rating: review.rating || 0,
+          rating: typeof review.rating === 'string' ? parseInt(review.rating, 10) : (review.rating || 0),
           review: review.review || '',
           status: review.status || 'inactive'
         }));
@@ -84,7 +84,7 @@ const Product_ReviewsPage = () => {
       const currentReview = reviews.find(rev => rev.id === reviewId);
       const newStatus = currentReview.status === 'active' ? 'inactive' : 'active';
       
-      const response = await axios.post(`http://localhost:8000/api/reviews/switch-status/${reviewId}`);
+      const response = await api.post(`/reviews/switch-status/${reviewId}`);
       
       if (response.status === 200) {
         setReviews(prevReviews => 
@@ -113,7 +113,7 @@ const Product_ReviewsPage = () => {
 
   const handleDelete = async (reviewId) => {
     try {
-      const response = await axios.post(`http://localhost:8000/api/reviews/delete/${reviewId}`);
+        const response = await api.post(`/reviews/delete/${reviewId}`);
       
       if (response.status === 200) {
         // Remove the deleted review from state
